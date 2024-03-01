@@ -6,7 +6,10 @@ import {COURSES} from "./db-data";
 
 
 export function getAllCourses(req: Request, res: Response) {
-
+    /**
+     * Object.values(): return an array containing all COURSE objects
+     * 
+     */
     res.status(200).json({payload:Object.values(COURSES)});
 
 }
