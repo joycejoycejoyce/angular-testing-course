@@ -1,10 +1,8 @@
-import { COURSES } from './../../../../server/db-data';
+import { Course } from './../model/course';
+import { COURSES, LESSONS } from './../../../../server/db-data';
 import { TestBed } from "@angular/core/testing";
 import { CoursesService } from "./courses.service"
 import {HttpClientTestingModule, HttpTestingController} from '@angular/common/http/testing';
-import { Course } from "../model/course";
-import { saveCourse } from '../../../../server/save-course.route';
-import { error } from 'console';
 
 
 describe('CoursesService', () => {
@@ -162,5 +160,47 @@ describe('CoursesService', () => {
         // simulate a failure response 
         // The Angular HTTP Client will interpret the status code provided. 
         req.flush('Error', {status: 500, statusText: 'Internal Server Error'});
-    })
+    });
+
+    it('should find a list of lessons', () => {
+        const COURSEID = 12;
+        /**
+         * need to EXPLICITLY include a return statement.
+         * specify the value to bereturned from the function. 
+         */
+        const output = Object.values(LESSONS).filter(lesson => {return lesson.courseId == COURSEID});
+
+        console.log("output: ", output);
+
+        // test the output data accuracy 
+        coursesService.findLessons(COURSEID).subscribe((arr) => {
+            expect(arr).toBeTruthy();
+            expect(arr.length).toEqual(3);
+        })
+        /**
+         * because the request link would have parameters at the end 'api/lessons?courseId=12&filter=''&sortOrder=asc'
+         * we only look at the URL 
+         */
+        const request = httpTestController.expectOne(req => 
+            req.url == '/api/lessons'
+        );
+
+        expect(request.request.method).toEqual('GET'); 
+
+        // assert the request parameters 
+        expect(request.request.params.get("courseId")).toEqual('12');
+        expect(request.request.params.get("filter")).toEqual('');
+        expect(request.request.params.get("sortOrder")).toEqual('asc');
+        expect(request.request.params.get("pageNumber")).toEqual('0');
+        expect(request.request.params.get("pageSize")).toEqual('3');
+        
+        
+        
+        
+        // simulate the http call output 
+        request.flush({
+           //const arr:[Course] = Object.values(COURSES);
+           payload: output.slice(0, 3)
+        })
+    });
 })
