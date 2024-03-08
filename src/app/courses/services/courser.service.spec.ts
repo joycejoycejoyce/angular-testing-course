@@ -144,8 +144,7 @@ describe('CoursesService', () => {
             /**
              * should not go inside the MEHTOD 1. Because the method should not be executed successfully 
              */
-            (anything) => {
-                console.log('anything', anything);
+            () => {
                 fail('This call to saveCourse() should not success');
             },
             // method 2: if the call to saveCourse() emit error 
@@ -169,8 +168,6 @@ describe('CoursesService', () => {
          * specify the value to bereturned from the function. 
          */
         const output = Object.values(LESSONS).filter(lesson => {return lesson.courseId == COURSEID});
-
-        console.log("output: ", output);
 
         // test the output data accuracy 
         coursesService.findLessons(COURSEID).subscribe((arr) => {
