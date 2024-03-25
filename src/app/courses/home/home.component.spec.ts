@@ -27,6 +27,7 @@ describe('HomeComponent', async () => {
   let coursesService: any;
 
   beforeEach(async () => {
+    //jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
     
     coursesService = jasmine.createSpyObj('CoursesService', ['findAllCourses']);
     await TestBed.configureTestingModule({
@@ -106,10 +107,34 @@ describe('HomeComponent', async () => {
   });
 
 
-  it("should display advanced courses when tab clicked", () => {
 
-    pending();
+  it("should display advanced courses when tab clicked", (done) => {
+    // Step 1: setup 
 
+    // load data to the page
+    const courses = Object.values(COURSES);
+    coursesService.findAllCourses.and.returnValue(of(courses));
+    fixture.detectChanges();
+    
+    // Step 2: execution 
+
+    // retrieve the tab element that user clicks 
+    const tabs = el.queryAll(By.css('.mdc-tab'));
+    const advancedTab = tabs[1].nativeElement;
+    advancedTab.click();
+    fixture.detectChanges();
+    
+    setTimeout(function(){
+      fixture.detectChanges();
+      // Step 3: Assertion 
+      const displayedList = el.queryAll(By.css('mat-card'));
+      // expect to have at least 1 course displayed 
+      expect(displayedList.length).toBeGreaterThan(0, 'The advanced tab should not be displayed');
+      
+      done();
+    }, 1000);
+
+    done();
   });
 
 });
