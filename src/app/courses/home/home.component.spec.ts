@@ -15,6 +15,7 @@ import {click} from '../common/test-utils';
 import { filter } from 'rxjs/operators';
 import { Course } from '../model/course';
 import { template } from 'cypress/types/lodash';
+import { all } from 'cypress/types/bluebird';
 
 
 
@@ -64,7 +65,7 @@ describe('HomeComponent', async () => {
   /**
    * Test when data only contains beginner courses, there should only contain 1 tab for beginner courses
    */
-  fit("should display only beginner courses", () => {
+  it("should display only beginner courses", () => {
     const beginnerCourses = Object.values(COURSES).filter((course: Course) => {
       return course.category === 'BEGINNER';
     });
@@ -83,22 +84,48 @@ describe('HomeComponent', async () => {
 
 
   it("should display only advanced courses", () => {
+    const advancedCourses = Object.values(COURSES).filter((course: Course) => {
+      return course.category === 'ADVANCED';
+    })
 
-      pending();
+    coursesService.findAllCourses.and.returnValue(of(advancedCourses));
+      
+    fixture.detectChanges();
 
+    const tabElements = el.queryAll(By.css('.mdc-tab'));
+    expect(tabElements.length).toEqual(1, 'Have unexpected number of tabs');
   });
 
 
   it("should display both tabs", () => {
+    const allCourses = Object.values(COURSES);
 
-    pending();
+    coursesService.findAllCourses.and.returnValue(of(allCourses));
+    
+    fixture.detectChanges();
 
+    const tabElements = el.queryAll(By.css('.mdc-tab'));
+    expect(tabElements.length).toEqual(2, 'Have unexpected number of tabs');
   });
 
 
   it("should display advanced courses when tab clicked", () => {
+    const allCourses = Object.values(COURSES);
+    coursesService.findAllCourses.and.returnValue(of(allCourses));
 
-    pending();
+    fixture.detectChanges(); 
+
+    // simulate user clicks the advanced tab 
+    const tabs = el.queryAll(By.css('mdc-tab'));
+    const advancedTab = tabs[1];
+    advancedTab.nativeElement.click();
+
+    // retrive all courses
+    const cards = el.queryAll(By.css('mat-card'));
+
+    // make sure there is course exist 
+    expect(cards.length).toBeGreaterThan(0, 'The course number should be greater than 0');
+
 
   });
 
